@@ -14,13 +14,15 @@ import dash_html_components as html
 import dash_core_components as dcc
 
 import dash
-from easy_dash import EasyDash
 
 from dash.dependencies import Input, Output, State
 from dash.exceptions import (
     PreventUpdate, DuplicateCallbackOutput, CallbackException,
     MissingCallbackContextException, InvalidCallbackReturnValue
 )
+
+from easy_dash import EasyDash
+
 from .IntegrationTests import IntegrationTests
 from .utils import assert_clean_console, invincible, wait_for
 
