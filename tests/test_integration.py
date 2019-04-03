@@ -14,6 +14,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 
 import dash
+from easy_dash import EasyDash
 
 from dash.dependencies import Input, Output, State
 from dash.exceptions import (
@@ -34,7 +35,7 @@ class Tests(IntegrationTests):
         self.wait_for_element_by_id = wait_for_element_by_id
 
     def test_auto_callback(self):
-        app = dash.Dash(__name__)
+        app = EasyDash(__name__)
         app.layout = html.Div([
             dcc.Input(
                 id='input',

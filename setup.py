@@ -5,7 +5,7 @@ main_ns = {}
 exec(open('easy_dash/version.py').read(), main_ns)  # pylint: disable=exec-used
 
 setup(
-    name='dash',
+    name='easy_dash',
     version=main_ns['__version__'],
     author='Kevin Mader',
     author_email='kevinmader@gmail.com',
