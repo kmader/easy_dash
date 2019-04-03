@@ -76,37 +76,37 @@ class EasyDash(Dash):
 
         return wrap_callback
 
+    def _repr_html_(self):
+        return self.show_app()
 
-def _repr_html_(self):
-    return self.show_app()
+    def show_app(self, port=9999, width="100%", height=700, offline=False):
+        """Show the dash app inside of jupyter."""
+        # for cases inside of a jupyterhub or binder
+        from IPython import display
 
+        in_binder = None
 
-def show_app(self, port=9999, width="100%", height=700, offline=False):
-    """Show the dash app inside of jupyter."""
-    # for cases inside of a jupyterhub or binder
-    from IPython import display
-
-    in_binder = None
-
-    in_binder = (
-        "JUPYTERHUB_SERVICE_PREFIX" in os.environ if in_binder is None else in_binder
-    )
-    if in_binder:
-        base_prefix = "{}proxy/{}/".format(
-            os.environ["JUPYTERHUB_SERVICE_PREFIX"], port
+        in_binder = (
+            "JUPYTERHUB_SERVICE_PREFIX" in os.environ
+            if in_binder is None
+            else in_binder
         )
-        url = "https://hub.mybinder.org{}".format(base_prefix)
-        self.config.requests_pathname_prefix = base_prefix
-    else:
-        url = "http://localhost:%d" % port
+        if in_binder:
+            base_prefix = "{}proxy/{}/".format(
+                os.environ["JUPYTERHUB_SERVICE_PREFIX"], port
+            )
+            url = "https://hub.mybinder.org{}".format(base_prefix)
+            self.config.requests_pathname_prefix = base_prefix
+        else:
+            url = "http://localhost:%d" % port
 
-    iframe = '<a href="{url}" target="_new">Open in new window</a><hr><iframe src="{url}" width={width} height={height}></iframe>'.format(
-        url=url, width=width, height=height
-    )
-    display.display_html(iframe, raw=True)
-    if offline:
-        self.css.config.serve_locally = True
-        self.scripts.config.serve_locally = True
-    return self.run_server(
-        debug=False, host="0.0.0.0", port=port  # needs to be false in Jupyter
-    )
+        iframe = '<a href="{url}" target="_new">Open in new window</a>'
+        iframe += '<hr><iframe src="{url}" width={width} height={height}></iframe>'
+        iframe = iframe.format(url=url, width=width, height=height)
+        display.display_html(iframe, raw=True)
+        if offline:
+            self.css.config.serve_locally = True
+            self.scripts.config.serve_locally = True
+        return self.run_server(
+            debug=False, host="0.0.0.0", port=port  # needs to be false in Jupyter
+        )
