@@ -9,7 +9,7 @@ def parse_requirements_file(filename):
         requires = [l.strip() for l in fid.readlines() if l]
     return requires
 
-INSTALL_REQUIRES = parse_requirements_file('requirements_install.txt')
+INSTALL_REQUIRES = parse_requirements_file('requirements.txt')
 
 setup(
     name='easy_dash',
