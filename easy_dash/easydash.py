@@ -1,5 +1,6 @@
 from __future__ import print_function
-import inspect, sys
+import inspect
+import sys
 import os
 from dash.dependencies import Input, Output
 from dash.dash import Dash  # noqa: F401
@@ -39,15 +40,14 @@ class EasyDash(Dash):
             return Output(component_id=comp_name, component_property=prop_name)
 
         def process_input(callback_func):
-            if sys.version_info[0] == 3:
-                # pylint: disable=maybe-no-member
-                spec_args = inspect.getfullargspec(callback_func).args
-            elif sys.version_info[0] == 2:
-                # pylint: disable=maybe-no-member, deprecated-method
-                spec_args = inspect.getargspec(callback_func).args
+            if hasattr(inspect, "getfullargspec"):
+                spec_func = getattr(inspect, "getfullargspec")
+            elif hasattr(inspect, "getargspec"):
+                spec_func = getattr(inspect, "getargspec")
             else:
-                raise ValueError("Requires Python 2 or 3, {}".format(sys.version_info))
+                raise ValueError("Requires Python 2/3")
 
+            spec_args = spec_func(callback_func).args
             input_list = []
             for c_comp_prop_arg in spec_args:
                 property_start = c_comp_prop_arg.rfind("_")
