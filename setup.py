@@ -4,6 +4,19 @@ from setuptools import setup, find_packages
 main_ns = {}
 exec(open('easy_dash/version.py').read(), main_ns)  # pylint: disable=exec-used
 
+def parse_requirements_file(filename):
+    with open(filename) as fid:
+        requires = [l.strip() for l in fid.readlines() if l]
+    return requires
+
+INSTALL_REQUIRES = parse_requirements_file('requirements_install.txt')
+
+# requirements for those browsing PyPI
+REQUIRES = [r.replace('>=', ' (>= ') + ')' for r in INSTALL_REQUIRES]
+REQUIRES = [r.replace('==', ' (== ') for r in REQUIRES]
+REQUIRES = [r.replace('[array]', '') for r in REQUIRES]
+
+
 setup(
     name='easy_dash',
     version=main_ns['__version__'],
@@ -15,17 +28,9 @@ setup(
     description=('Easy wrapper to make Dash apps easier'),
     long_description=io.open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
-    install_requires=[
-        'Flask>=0.12',
-        'flask-compress',
-        'plotly',
-        'dash',
-        'dash_renderer==0.21.0',
-        'dash-core-components==0.45.0',
-        'dash-html-components==0.15.0',
-        'dash-table==3.6.0'
-    ],
-    url='https://github.com/kmader/easy_dash/blob/master/setup.py',
+    install_requires=INSTALL_REQUIRES,
+    requires=REQUIRES,
+    url='https://github.com/kmader/easy_dash',
     classifiers=[
         'Development Status :: 1 - Alpha/Unstable',
         'Environment :: Web Environment',

@@ -1,12 +1,12 @@
 from __future__ import print_function
-import inspect
-
-from dash.dependencies import Input, Output, State
+import inspect, sys
+from dash.dependencies import Input, Output
 from dash.dash import Dash  # noqa: F401
 
 class EasyDash(Dash):
     def auto_callback(self, debug=False):
-        """Creates callbacks using function name
+        """Creates callbacks using function name.
+
         """
 
         valid_prefix_names = ['update_', 'callback_']
