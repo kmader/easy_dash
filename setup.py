@@ -11,12 +11,6 @@ def parse_requirements_file(filename):
 
 INSTALL_REQUIRES = parse_requirements_file('requirements_install.txt')
 
-# requirements for those browsing PyPI
-REQUIRES = [r.replace('>=', ' (>= ') + ')' for r in INSTALL_REQUIRES]
-REQUIRES = [r.replace('==', ' (== ') for r in REQUIRES]
-REQUIRES = [r.replace('[array]', '') for r in REQUIRES]
-
-
 setup(
     name='easy_dash',
     version=main_ns['__version__'],
@@ -29,7 +23,6 @@ setup(
     long_description=io.open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
     install_requires=INSTALL_REQUIRES,
-    requires=REQUIRES,
     url='https://github.com/kmader/easy_dash',
     classifiers=[
         'Development Status :: 1 - Alpha/Unstable',

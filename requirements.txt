@@ -1,0 +1,8 @@
+Flask>=0.12
+flask-compress
+plotly
+dash
+dash_renderer
+dash-core-components
+dash-html-components
+notebook
