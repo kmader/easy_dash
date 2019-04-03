@@ -1,6 +1,5 @@
 from __future__ import print_function
 import inspect
-import sys
 import os
 from dash.dependencies import Input, Output
 from dash.dash import Dash  # noqa: F401
@@ -29,10 +28,10 @@ class EasyDash(Dash):
             callback_name = getattr(callback_func, "__name__", "")
             comp_prop_start_idx = check_prefix(callback_name)
             comp_prop_name = callback_name[comp_prop_start_idx:]
-            property_start = comp_prop_name.rfind("_")
+            property_start = comp_prop_name.rfind("_of_")
             if property_start >= 1:
-                prop_name = comp_prop_name[property_start + 1 :]
-                comp_name = comp_prop_name[:property_start]
+                comp_name = comp_prop_name[property_start + 4 :]
+                prop_name = comp_prop_name[:property_start]
             else:
                 # assume children if no underscore
                 comp_name = comp_prop_name
@@ -43,6 +42,7 @@ class EasyDash(Dash):
             if hasattr(inspect, "getfullargspec"):
                 spec_func = getattr(inspect, "getfullargspec")
             elif hasattr(inspect, "getargspec"):
+                # pylint: disable=maybe-no-member, deprecated-method
                 spec_func = getattr(inspect, "getargspec")
             else:
                 raise ValueError("Requires Python 2/3")
@@ -50,10 +50,10 @@ class EasyDash(Dash):
             spec_args = spec_func(callback_func).args
             input_list = []
             for c_comp_prop_arg in spec_args:
-                property_start = c_comp_prop_arg.rfind("_")
+                property_start = c_comp_prop_arg.rfind("_of_")
                 if property_start >= 1:
-                    comp_name = c_comp_prop_arg[:property_start]
-                    prop_name = c_comp_prop_arg[property_start + 1 :]
+                    prop_name = c_comp_prop_arg[:property_start]
+                    comp_name = c_comp_prop_arg[property_start + 4 :]
                 else:
                     # assume value if no underscore
                     comp_name = c_comp_prop_arg
@@ -81,10 +81,12 @@ def _repr_html_(self):
     return self.show_app()
 
 
-def show_app(self, port=9999, width="100%", height=700, offline=False, in_binder=None):
+def show_app(self, port=9999, width="100%", height=700, offline=False):
     """Show the dash app inside of jupyter."""
     # for cases inside of a jupyterhub or binder
     from IPython import display
+
+    in_binder = None
 
     in_binder = (
         "JUPYTERHUB_SERVICE_PREFIX" in os.environ if in_binder is None else in_binder

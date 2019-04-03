@@ -41,7 +41,7 @@ class Tests(IntegrationTests):
 
         self.wait_for_element_by_id = wait_for_element_by_id
 
-    def test_auto_callback(self):
+    def test_auto_callback_default(self):
         app = EasyDash(__name__)
         app.layout = html.Div(
             [
@@ -53,9 +53,9 @@ class Tests(IntegrationTests):
         call_count = Value("i", 0)
 
         @app.auto_callback()
-        def update_output1_children(input_value):
+        def update_output1(input):
             call_count.value = call_count.value + 1
-            return input_value
+            return input
 
         self.startServer(app)
 
@@ -87,6 +87,56 @@ class Tests(IntegrationTests):
             2 +
             # one for each hello world character
             len("hello world"),
+        )
+
+        assert_clean_console(self)
+
+    def test_auto_callback(self):
+        app = EasyDash(__name__)
+        app.layout = html.Div(
+            [
+                dcc.Input(id="input", value="initial value"),
+                html.Div(html.Div([1.5, None, "string", html.Div(id="output1")])),
+            ]
+        )
+
+        call_count = Value("i", 0)
+
+        @app.auto_callback()
+        def update_children_of_output1(value_of_input):
+            call_count.value = call_count.value + 1
+            return value_of_input
+
+        self.startServer(app)
+
+        self.wait_for_text_to_equal("#output1", "initial value")
+        self.percy_snapshot(name="auto-callback-3")
+
+        input1 = self.wait_for_element_by_id("input")
+
+        chain = (
+            ActionChains(self.driver)
+            .click(input1)
+            .send_keys(Keys.HOME)
+            .key_down(Keys.SHIFT)
+            .send_keys(Keys.END)
+            .key_up(Keys.SHIFT)
+            .send_keys(Keys.DELETE)
+        )
+        chain.perform()
+
+        input1.send_keys("bye world")
+
+        self.wait_for_text_to_equal("#output1", "bye world")
+        self.percy_snapshot(name="auto-callback-4")
+
+        self.assertEqual(
+            call_count.value,
+            # an initial call to retrieve the first value
+            # and one for clearing the input
+            2 +
+            # one for each hello world character
+            len("bye world"),
         )
 
         assert_clean_console(self)
