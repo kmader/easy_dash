@@ -13,13 +13,12 @@ TIMEOUT = 20
 
 
 class IntegrationTests(unittest.TestCase):
-
-    def percy_snapshot(cls, name=''):
-        snapshot_name = '{} - py{}.{}'.format(name, sys.version_info.major, sys.version_info.minor)
-        print(snapshot_name)
-        cls.percy_runner.snapshot(
-            name=snapshot_name
+    def percy_snapshot(cls, name=""):
+        snapshot_name = "{} - py{}.{}".format(
+            name, sys.version_info.major, sys.version_info.minor
         )
+        print(snapshot_name)
+        cls.percy_runner.snapshot(name=snapshot_name)
 
     def wait_for_element_by_css_selector(self, selector):
         return WebDriverWait(self.driver, TIMEOUT).until(
@@ -28,8 +27,9 @@ class IntegrationTests(unittest.TestCase):
 
     def wait_for_text_to_equal(self, selector, assertion_text):
         return WebDriverWait(self.driver, TIMEOUT).until(
-            EC.text_to_be_present_in_element((By.CSS_SELECTOR, selector),
-                                             assertion_text)
+            EC.text_to_be_present_in_element(
+                (By.CSS_SELECTOR, selector), assertion_text
+            )
         )
 
     @classmethod
@@ -38,9 +38,7 @@ class IntegrationTests(unittest.TestCase):
         cls.driver = webdriver.Chrome()
 
         loader = percy.ResourceLoader(
-            webdriver=cls.driver,
-            base_url='/assets',
-            root_dir='tests/assets'
+            webdriver=cls.driver, base_url="/assets", root_dir="tests/assets"
         )
         cls.percy_runner = percy.Runner(loader=loader)
 
@@ -56,7 +54,7 @@ class IntegrationTests(unittest.TestCase):
         pass
 
     def tearDown(s):
-        if hasattr(s, 'server_process'):
+        if hasattr(s, "server_process"):
             time.sleep(2)
             s.server_process.terminate()
             time.sleep(2)
@@ -64,12 +62,7 @@ class IntegrationTests(unittest.TestCase):
     def startServer(s, dash):
         def run():
             dash.scripts.config.serve_locally = True
-            dash.run_server(
-                port=8050,
-                debug=False,
-                processes=4,
-                threaded=False
-            )
+            dash.run_server(port=8050, debug=False, processes=4, threaded=False)
 
         # Run on a separate process so that it doesn't block
         s.server_process = multiprocessing.Process(target=run)
@@ -77,11 +70,11 @@ class IntegrationTests(unittest.TestCase):
         time.sleep(0.5)
 
         # Visit the dash page
-        s.driver.get('http://localhost:8050')
+        s.driver.get("http://localhost:8050")
         time.sleep(0.5)
 
         # Inject an error and warning logger
-        logger = '''
+        logger = """
         window.tests = {};
         window.tests.console = {error: [], warn: [], log: []};
 
@@ -103,5 +96,5 @@ class IntegrationTests(unittest.TestCase):
             window.tests.console.error.push({method: 'error', arguments: arguments});
             return _error.apply(console, arguments);
         };
-        '''
+        """
         s.driver.execute_script(logger)

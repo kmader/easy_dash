@@ -28,7 +28,7 @@ jobs:
               pip install -r $REQUIREMENTS_FILE --force-reinstall
 
       - run:
-          name: Install dependencies (dash)
+          name: Install dependencies (easy_dash)
           command: |
               . venv/bin/activate
               pip install -e . --quiet

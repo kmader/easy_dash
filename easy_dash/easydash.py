@@ -1,5 +1,6 @@
 from __future__ import print_function
 import inspect, sys
+import os
 from dash.dependencies import Input, Output
 from dash.dash import Dash  # noqa: F401
 
@@ -75,18 +76,16 @@ class EasyDash(Dash):
 
         return wrap_callback
 
-    from IPython import display
-
-
-import os
-
 
 def _repr_html_(self):
     return self.show_app()
 
 
 def show_app(self, port=9999, width="100%", height=700, offline=False, in_binder=None):
+    """Show the dash app inside of jupyter."""
     # for cases inside of a jupyterhub or binder
+    from IPython import display
+
     in_binder = (
         "JUPYTERHUB_SERVICE_PREFIX" in os.environ if in_binder is None else in_binder
     )
@@ -95,7 +94,7 @@ def show_app(self, port=9999, width="100%", height=700, offline=False, in_binder
             os.environ["JUPYTERHUB_SERVICE_PREFIX"], port
         )
         url = "https://hub.mybinder.org{}".format(base_prefix)
-        app.config.requests_pathname_prefix = base_prefix
+        self.config.requests_pathname_prefix = base_prefix
     else:
         url = "http://localhost:%d" % port
 

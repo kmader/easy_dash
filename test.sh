@@ -10,6 +10,7 @@ pyversion="$(python -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')"
 
 if [ "$pyversion" -ge "37" ]; then
     black easy_dash --check || EXIT_STATE=$?
+    black tests --check || EXIT_STATE=$?
 fi
 
 if [ $EXIT_STATE -ne 0 ]; then
