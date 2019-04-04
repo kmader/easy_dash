@@ -1,5 +1,7 @@
 Flask>=0.12
 flask-compress
+numpy
+matplotlib
 plotly
 dash
 dash_renderer

@@ -1,3 +1,4 @@
+"""The easydash wrapper class"""
 from __future__ import print_function
 import inspect
 import os
@@ -9,7 +10,31 @@ class EasyDash(Dash):
     """Wraps Dash apps and adds useful functions"""
 
     def auto_callback(self, debug=False):
-        """Creates callbacks using function name."""
+        """Creates callbacks using function name.
+        :param debug: show more detailed messages
+
+        The function name needs to start with update_ or callback_
+        followed immediately by the name of the output it should change
+        formatted using property_of_component (reversed yes, but easier to read)
+        for example output_1.children would be "update_children_of_output_1"
+
+        The arguments of the function should all be named similarly so if we use
+        input_1.value then we write it as value_of_input_1
+
+        For output we assume children (if no _of_ is present)
+        For input we assume value (if no _of_ is present)
+
+        The total example is
+        @ezdash_app.auto_callback()
+        def update_children_of_output_1(value_of_input_1):
+            return value_of_input_1
+
+        or (using the default properties)
+        @ezdash_app.auto_callback()
+        def update_output_1(input_1):
+            return input_1
+
+        """
 
         valid_prefix_names = ["update_", "callback_"]
 

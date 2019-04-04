@@ -11,3 +11,7 @@ requests[security]
 flake8
 pylint==1.9.4
 dash
+doctest
+pytest-cov
+codecov
+nose

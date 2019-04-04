@@ -8,7 +8,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 import dash_dangerously_set_inner_html
-import dash_flow_example
 
 import dash_html_components as html
 import dash_core_components as dcc
