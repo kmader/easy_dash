@@ -59,10 +59,10 @@ class IntegrationTests(unittest.TestCase):
             s.server_process.terminate()
             time.sleep(2)
 
-    def startServer(s, dash):
+    def startServer(s, dash, port=8050):
         def run():
             dash.scripts.config.serve_locally = True
-            dash.run_server(port=8050, debug=False, processes=4, threaded=False)
+            dash.run_server(port=port, debug=False, processes=4, threaded=False)
 
         # Run on a separate process so that it doesn't block
         s.server_process = multiprocessing.Process(target=run)
@@ -70,7 +70,7 @@ class IntegrationTests(unittest.TestCase):
         time.sleep(0.5)
 
         # Visit the dash page
-        s.driver.get("http://localhost:8050")
+        s.driver.get("http://localhost:{}".format(port))
         time.sleep(0.5)
 
         # Inject an error and warning logger

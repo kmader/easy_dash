@@ -37,7 +37,7 @@ class Tests(IntegrationTests):
             call_count.value = call_count.value + 1
             return input
 
-        self.startServer(app)
+        self.startServer(app, 8050)
 
         self.wait_for_text_to_equal("#output1", "initial value")
         self.percy_snapshot(name="auto-callback-1")
@@ -87,7 +87,7 @@ class Tests(IntegrationTests):
             call_count.value = call_count.value + 1
             return value_of_input
 
-        self.startServer(app)
+        self.startServer(app, 8051)
 
         self.wait_for_text_to_equal("#output1", "initial value")
         self.percy_snapshot(name="auto-callback-3")
