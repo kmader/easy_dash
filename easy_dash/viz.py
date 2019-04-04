@@ -1,3 +1,6 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
 import base64
 from io import BytesIO
 
@@ -20,19 +23,19 @@ def fig_to_uri(
     :param dpi: specify the DPI if desired
     :param save_args: arguments to save with
     :return:
+    >>> import matplotlib
+    >>> matplotlib.use('Agg')
     >>> fig, ax1 = plt.subplots(1, 1, figsize=(4,6))
     >>> lowres_str = fig_to_uri(fig, close_all=True, dpi=50)
-    >>> lowres_str[:50]
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgA'
-    >>> len(lowres_str)
-    4042
+    >>> print(lowres_str[:50])
+    data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgA
     >>> fig, ax1 = plt.subplots(1, 1, figsize=(4,6))
     >>> highres_str = fig_to_uri(fig, close_all = True, dpi=100)
-    >>> len(highres_str)
-    10478
+    >>> print(highres_str[:50])
+    data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAA
     """
     out_img = BytesIO()
-    in_fig.savefig(out_img, img_format="png", dpi=dpi, **save_args)
+    in_fig.savefig(out_img, format="png", dpi=dpi, **save_args)
     if close_all:
         in_fig.clf()
         plt.close("all")
@@ -61,10 +64,10 @@ def _np_to_uri(
     :return: the base64 string
     Examples
     ========
-    >>> _np_to_uri(np.zeros((100,100)))[:50]
-    'iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAABUE'
-    >>> _np_to_uri(np.zeros((5, 10)), img_format = 'jpeg')[:50]
-    '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQ'
+    >>> print(_np_to_uri(np.zeros((100,100)))[:50])
+    iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAABUE
+    >>> print(_np_to_uri(np.zeros((5, 10)), img_format = 'jpeg')[:50])
+    /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQ
     >>> len(_np_to_uri(np.zeros((100,100)), alpha = False))
     484
     >>> len(_np_to_uri(np.zeros((100,100)), alpha = True))
