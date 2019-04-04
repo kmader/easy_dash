@@ -22,7 +22,7 @@ class Tests(IntegrationTests):
         self.wait_for_element_by_id = wait_for_element_by_id
 
     def test_auto_callback_default(self):
-        app = EasyDash('auto_callback_default')
+        app = EasyDash("auto_callback_default")
         app.layout = html.Div(
             [
                 dcc.Input(id="input", value="initial value"),
@@ -72,7 +72,7 @@ class Tests(IntegrationTests):
         assert_clean_console(self)
 
     def test_auto_callback(self):
-        app = EasyDash('auto_callback')
+        app = EasyDash("auto_callback")
         app.layout = html.Div(
             [
                 dcc.Input(id="input", value="initial value"),
