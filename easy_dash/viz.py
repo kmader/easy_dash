@@ -7,8 +7,13 @@ from matplotlib import pyplot as plt
 from matplotlib.pyplot import cm
 
 
-def fig_to_uri(in_fig, close_all=True, dpi=None, **save_args):
-    # type: (plt.Figure) -> str
+def fig_to_uri(
+    in_fig,  # type: plt.Figure
+    close_all=True,
+    dpi=None,
+    **save_args
+):
+    # type: (...) -> str
     """Save a figure as a URI
     :param in_fig: the figure to save
     :param close_all: close all other figures afterwards
@@ -143,7 +148,7 @@ def force_array_dim(
     ], "Crop mode must be random or " "center: {}".format(crop_mode)
 
     pad_image = pad_nd_image(in_img, out_shape, mode=pad_mode, **pad_args)
-    crop_dims = []
+    crop_dims = []  # type: List[slice]
     for c_shape, d_shape in zip(pad_image.shape, out_shape):
         cur_slice = slice(0, c_shape)  # default
         if d_shape is not None:
@@ -197,7 +202,7 @@ def pad_nd_image(
     [ 0.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.
       1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  0.  0.]
     """
-    pad_dims = []
+    pad_dims = []  # type: List[Tuple[int, int]]
     for c_shape, d_shape in zip(in_img.shape, out_shape):
         pad_before, pad_after = 0, 0
         if d_shape is not None:

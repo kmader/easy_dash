@@ -17,3 +17,4 @@ pytest-cov
 codecov
 mypy
 nose
+pillow

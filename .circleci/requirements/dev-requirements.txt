@@ -14,3 +14,4 @@ dash
 pytest-cov
 codecov
 nose
+pillow
