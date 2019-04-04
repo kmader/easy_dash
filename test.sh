@@ -1,6 +1,7 @@
 EXIT_STATE=0
 
-python -m unittest tests.test_integration || EXIT_STATE=$?
+pytest --cov=easy_dash || EXIT_STATE=$?
+codecov
 
 pylint easy_dash setup.py --rcfile=$PYLINTRC #|| EXIT_STATE=$?
 pylint tests -d all -e C0410,C0411,C0412,C0413,W0109 || EXIT_STATE=$?

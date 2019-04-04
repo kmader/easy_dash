@@ -1,30 +1,11 @@
-import json
 from multiprocessing import Value
-import datetime
-import itertools
-import re
-import time
+
+import dash_core_components as dcc
+import dash_html_components as html
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
-import dash_dangerously_set_inner_html
-
-import dash_html_components as html
-import dash_core_components as dcc
-
-import dash
-
-from dash.dependencies import Input, Output, State
-from dash.exceptions import (
-    PreventUpdate,
-    DuplicateCallbackOutput,
-    CallbackException,
-    MissingCallbackContextException,
-    InvalidCallbackReturnValue,
-)
-
 from easy_dash import EasyDash
-
 from .IntegrationTests import IntegrationTests
 from .utils import assert_clean_console, invincible, wait_for
 
@@ -41,7 +22,7 @@ class Tests(IntegrationTests):
         self.wait_for_element_by_id = wait_for_element_by_id
 
     def test_auto_callback_default(self):
-        app = EasyDash(__name__)
+        app = EasyDash("auto_callback_default")
         app.layout = html.Div(
             [
                 dcc.Input(id="input", value="initial value"),
@@ -56,7 +37,7 @@ class Tests(IntegrationTests):
             call_count.value = call_count.value + 1
             return input
 
-        self.startServer(app)
+        self.startServer(app, 8050)
 
         self.wait_for_text_to_equal("#output1", "initial value")
         self.percy_snapshot(name="auto-callback-1")
@@ -91,7 +72,7 @@ class Tests(IntegrationTests):
         assert_clean_console(self)
 
     def test_auto_callback(self):
-        app = EasyDash(__name__)
+        app = EasyDash("auto_callback")
         app.layout = html.Div(
             [
                 dcc.Input(id="input", value="initial value"),
@@ -106,7 +87,7 @@ class Tests(IntegrationTests):
             call_count.value = call_count.value + 1
             return value_of_input
 
-        self.startServer(app)
+        self.startServer(app, 8051)
 
         self.wait_for_text_to_equal("#output1", "initial value")
         self.percy_snapshot(name="auto-callback-3")

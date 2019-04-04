@@ -1,3 +1,6 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
 import base64
 from io import BytesIO
 
@@ -20,16 +23,16 @@ def fig_to_uri(
     :param dpi: specify the DPI if desired
     :param save_args: arguments to save with
     :return:
+    >>> import matplotlib
+    >>> matplotlib.use('Agg')
     >>> fig, ax1 = plt.subplots(1, 1, figsize=(4,6))
     >>> lowres_str = fig_to_uri(fig, close_all=True, dpi=50)
-    >>> lowres_str[:50]
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgA'
-    >>> len(lowres_str)
-    4678
+    >>> print(lowres_str[:50])
+    data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgA
     >>> fig, ax1 = plt.subplots(1, 1, figsize=(4,6))
     >>> highres_str = fig_to_uri(fig, close_all = True, dpi=100)
-    >>> len(highres_str)
-    12578
+    >>> print(highres_str[:50])
+    data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAA
     """
     out_img = BytesIO()
     in_fig.savefig(out_img, format="png", dpi=dpi, **save_args)
@@ -61,10 +64,10 @@ def _np_to_uri(
     :return: the base64 string
     Examples
     ========
-    >>> _np_to_uri(np.zeros((100,100)))[:50]
-    'iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAABUE'
-    >>> _np_to_uri(np.zeros((5, 10)), format = 'jpeg')[:50]
-    '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQ'
+    >>> print(_np_to_uri(np.zeros((100,100)))[:50])
+    iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAABUE
+    >>> print(_np_to_uri(np.zeros((5, 10)), img_format = 'jpeg')[:50])
+    /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQ
     >>> len(_np_to_uri(np.zeros((100,100)), alpha = False))
     484
     >>> len(_np_to_uri(np.zeros((100,100)), alpha = True))
@@ -112,35 +115,33 @@ def force_array_dim(
     :param pad_args:
     :return:
     >>> np.random.seed(2018)
-    >>> pprint(force_array_dim(np.eye(3), [7,7], crop_mode = 'random'))
-    [[ 1.  0.  0.  0.  1.  0.  0.]
-     [ 0.  1.  0.  1.  0.  1.  0.]
-     [ 0.  0.  1.  0.  0.  0.  1.]
-     [ 0.  1.  0.  1.  0.  1.  0.]
-     [ 1.  0.  0.  0.  1.  0.  0.]
-     [ 0.  1.  0.  1.  0.  1.  0.]
-     [ 0.  0.  1.  0.  0.  0.  1.]]
-    >>> pprint(force_array_dim(np.eye(3), [2,2], crop_mode = 'center'))
-    [[ 1.  0.]
-     [ 0.  1.]]
-    >>> pprint(force_array_dim(np.eye(3), [2,2], crop_mode = 'random'))
-    [[ 1.  0.]
-     [ 0.  1.]]
-    >>> pprint(force_array_dim(np.eye(3), [2,2], crop_mode = 'random'))
-    [[ 0.  0.]
-     [ 1.  0.]]
+    >>> force_array_dim(np.eye(3), [7,7], crop_mode = 'random')
+    array([[1., 0., 0., 0., 1., 0., 0.],
+           [0., 1., 0., 1., 0., 1., 0.],
+           [0., 0., 1., 0., 0., 0., 1.],
+           [0., 1., 0., 1., 0., 1., 0.],
+           [1., 0., 0., 0., 1., 0., 0.],
+           [0., 1., 0., 1., 0., 1., 0.],
+           [0., 0., 1., 0., 0., 0., 1.]])
+    >>> force_array_dim(np.eye(3), [2,2], crop_mode = 'center')
+    array([[1., 0.],
+           [0., 1.]])
+    >>> force_array_dim(np.eye(3), [2,2], crop_mode = 'random')
+    array([[1., 0.],
+           [0., 1.]])
+    >>> force_array_dim(np.eye(3), [2,2], crop_mode = 'random')
+    array([[0., 0.],
+           [1., 0.]])
     >>> e_args = dict(out_shape = [2,2], crop_mode = 'junk')
-    >>> get_error(force_array_dim, in_img = np.eye(3), **e_args)
-    'Crop mode must be random or center: junk'
     >>> t_mat = np.ones((1, 7, 9, 3))
     >>> f_args = dict(pad_mode = 'constant', constant_values=0)
     >>> o_img = force_array_dim(t_mat, [None, 12, 12, None], **f_args)
     >>> o_img.shape
     (1, 12, 12, 3)
-    >>> pprint(o_img.mean())
+    >>> o_img.mean()
     0.4375
-    >>> pprint(o_img[0,3,:,0])
-    [ 0.  1.  1.  1.  1.  1.  1.  1.  1.  1.  0.  0.]
+    >>> o_img[0,3,:,0]
+    array([0., 1., 1., 1., 1., 1., 1., 1., 1., 1., 0., 0.])
     """
     assert crop_mode in [
         "random",
@@ -180,27 +181,27 @@ def pad_nd_image(
     :param mode: the mode to use in numpy.pad
     :param kwargs: arguments for numpy.pad
     :return:
-    >>> pprint(pad_nd_image(np.eye(3), [7,7]))
-    [[ 1.  0.  0.  0.  1.  0.  0.]
-     [ 0.  1.  0.  1.  0.  1.  0.]
-     [ 0.  0.  1.  0.  0.  0.  1.]
-     [ 0.  1.  0.  1.  0.  1.  0.]
-     [ 1.  0.  0.  0.  1.  0.  0.]
-     [ 0.  1.  0.  1.  0.  1.  0.]
-     [ 0.  0.  1.  0.  0.  0.  1.]]
-    >>> pprint(pad_nd_image(np.eye(3), [2,2])) # should return the same
-    [[ 1.  0.  0.]
-     [ 0.  1.  0.]
-     [ 0.  0.  1.]]
+    >>> pad_nd_image(np.eye(3), [7,7])
+    array([[1., 0., 0., 0., 1., 0., 0.],
+           [0., 1., 0., 1., 0., 1., 0.],
+           [0., 0., 1., 0., 0., 0., 1.],
+           [0., 1., 0., 1., 0., 1., 0.],
+           [1., 0., 0., 0., 1., 0., 0.],
+           [0., 1., 0., 1., 0., 1., 0.],
+           [0., 0., 1., 0., 0., 0., 1.]])
+    >>> pad_nd_image(np.eye(3), [2,2]) # should return the same
+    array([[1., 0., 0.],
+           [0., 1., 0.],
+           [0., 0., 1.]])
     >>> t_mat = np.ones((2, 27, 29, 3))
     >>> o_img = pad_nd_image(t_mat, [None, 32, 32, None], mode = 'constant', constant_values=0)
     >>> o_img.shape
     (2, 32, 32, 3)
-    >>> pprint(o_img.mean())
+    >>> o_img.mean()
     0.7646484375
-    >>> pprint(o_img[0,3,:,0])
-    [ 0.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.
-      1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  0.  0.]
+    >>> o_img[0,3,:,0]
+    array([0., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+           1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 0., 0.])
     """
     pad_dims = []  # type: List[Tuple[int, int]]
     for c_shape, d_shape in zip(in_img.shape, out_shape):
