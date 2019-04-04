@@ -2,12 +2,16 @@ from multiprocessing import Value
 
 import dash_core_components as dcc
 import dash_html_components as html
+import matplotlib
+import matplotlib.pyplot as plt
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 from easy_dash import EasyDash
 from .IntegrationTests import IntegrationTests
 from .utils import assert_clean_console, invincible, wait_for
+
+matplotlib.use("Agg")
 
 
 class Tests(IntegrationTests):
@@ -118,5 +122,45 @@ class Tests(IntegrationTests):
             # one for each hello world character
             len("bye world"),
         )
+
+        assert_clean_console(self)
+
+    def test_mpl_callback(self):
+        app = EasyDash("mpl_callback")
+        app.layout = html.Div(
+            [dcc.Input(id="plot_size", value="5"), html.Div(id="plot")]
+        )
+
+        call_count = Value("i", 0)
+
+        @app.mpl_callback()
+        def update_children_of_plot(value_of_plot_size):
+            call_count.value = call_count.value + 1
+            height = float(value_of_plot_size)
+            fig, ax1 = plt.subplots(1, 1, figsize=(height, 5))
+            ax1.plot([0, 1, 1, 0], [0, 0, 1, 1], "r-.")
+            ax1.set_title(height)
+            return fig
+
+        self.startServer(app, 8052)
+
+        self.wait_for_text_to_equal("#plot_size", "5")
+        self.percy_snapshot(name="mpl-callback-1")
+
+        input_ps = self.wait_for_element_by_id("plot_size")
+
+        chain = (
+            ActionChains(self.driver)
+            .click(input_ps)
+            .send_keys(Keys.HOME)
+            .key_down(Keys.SHIFT)
+            .send_keys(Keys.END)
+            .key_up(Keys.SHIFT)
+            .send_keys(Keys.DELETE)
+        )
+        chain.perform()
+
+        input_ps.send_keys("20")
+        self.percy_snapshot(name="mpl-callback-2")
 
         assert_clean_console(self)
