@@ -128,14 +128,19 @@ class Tests(IntegrationTests):
     def test_mpl_callback(self):
         app = EasyDash("mpl_callback")
         app.layout = html.Div(
-            [dcc.Input(id="plot_size", value="5"), html.Div(id="plot")]
+            [
+                dcc.Input(id="plot_size", value="5"),
+                html.Div(id="output1"),
+                html.Div(id="plot"),
+            ]
         )
 
-        call_count = Value("i", 0)
+        @app.auto_callback()
+        def update_output1(value_of_plot_size):
+            return "New Size: {}".format(value_of_plot_size)
 
         @app.mpl_callback()
         def update_children_of_plot(value_of_plot_size):
-            call_count.value = call_count.value + 1
             height = float(value_of_plot_size)
             fig, ax1 = plt.subplots(1, 1, figsize=(height, 5))
             ax1.plot([0, 1, 1, 0], [0, 0, 1, 1], "r-.")
@@ -144,7 +149,7 @@ class Tests(IntegrationTests):
 
         self.startServer(app, 8052)
 
-
+        self.wait_for_text_to_equal("#output1", "New Size: 5")
         self.percy_snapshot(name="mpl-callback-1")
 
         input_ps = self.wait_for_element_by_id("plot_size")
@@ -161,6 +166,7 @@ class Tests(IntegrationTests):
         chain.perform()
 
         input_ps.send_keys("20")
+        self.wait_for_text_to_equal("#output1", "New Size: 20")
         self.percy_snapshot(name="mpl-callback-2")
 
         assert_clean_console(self)

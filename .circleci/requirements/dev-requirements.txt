@@ -13,4 +13,3 @@ dash
 pytest-cov
 codecov
 nose
-matplotlib
