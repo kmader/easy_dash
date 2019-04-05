@@ -144,7 +144,7 @@ class Tests(IntegrationTests):
 
         self.startServer(app, 8052)
 
-        self.wait_for_text_to_equal("#plot_size", "5")
+
         self.percy_snapshot(name="mpl-callback-1")
 
         input_ps = self.wait_for_element_by_id("plot_size")
