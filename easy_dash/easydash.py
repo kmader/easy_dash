@@ -6,6 +6,8 @@ import os
 from functools import wraps
 
 import dash_html_components as html
+import dash_core_components as dcc
+import plotly.tools as tls
 from dash.dash import Dash
 from dash.dependencies import Input, Output
 
@@ -117,15 +119,24 @@ class EasyDash(Dash):
 
         return wrap_callback
 
-    def mpl_callback(self, auto=True, dpi=None, **save_args):
-        """Turns a matplotlib figure into a Dash object."""
+    def mpl_callback(self, auto=True, use_plotly=False, dpi=None, **sv_args):
+        """Turns a matplotlib figure into a Dash object.
+        :param auto: automatically make callback
+        :param use_plotly: convert mpl to plotly
+        :param dpi:
+        :param sv_args:
+        :return:
+        """
 
         def wrap_func(func):
             @wraps(func)
             def add_context(*args, **kwargs):
                 self.auto_callback(func)
                 out_fig = func(*args, **kwargs)
-                return html.Img(src=fig_to_uri(out_fig, dpi=dpi, **save_args))
+                if use_plotly:
+                    return dcc.Graph(figure=tls.mpl_to_plotly(out_fig))
+                else:
+                    return html.Img(src=fig_to_uri(out_fig, dpi=dpi, **sv_args))
 
             if auto:
                 output, inputs = guess_io_args(func)
