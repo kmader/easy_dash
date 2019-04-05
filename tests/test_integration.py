@@ -80,20 +80,20 @@ class Tests(IntegrationTests):
         app.layout = html.Div(
             [
                 dcc.Input(id="input", value="initial value"),
-                html.Div(html.Div([1.5, None, "string", html.Div(id="output1")])),
+                html.Div(html.Div([1.5, None, "string", html.Div(id="output2")])),
             ]
         )
 
         call_count = Value("i", 0)
 
         @app.auto_callback()
-        def update_children_of_output1(value_of_input):
+        def update_children_of_output2(value_of_input):
             call_count.value = call_count.value + 1
             return value_of_input
 
         self.startServer(app, 8051)
 
-        self.wait_for_text_to_equal("#output1", "initial value")
+        self.wait_for_text_to_equal("#output2", "initial value")
         self.percy_snapshot(name="auto-callback-3")
 
         input1 = self.wait_for_element_by_id("input")
@@ -111,7 +111,7 @@ class Tests(IntegrationTests):
 
         input1.send_keys("bye world")
 
-        self.wait_for_text_to_equal("#output1", "bye world")
+        self.wait_for_text_to_equal("#output2", "bye world")
         self.percy_snapshot(name="auto-callback-4")
 
         self.assertEqual(
@@ -130,13 +130,13 @@ class Tests(IntegrationTests):
         app.layout = html.Div(
             [
                 dcc.Input(id="plot_size", value="5"),
-                html.Div(id="output1"),
+                html.Div(id="output_mpl"),
                 html.Div(id="plot"),
             ]
         )
 
         @app.auto_callback()
-        def update_output1(value_of_plot_size):
+        def update_output_mpl(value_of_plot_size):
             return "New Size: {}".format(value_of_plot_size)
 
         @app.mpl_callback()
@@ -149,7 +149,7 @@ class Tests(IntegrationTests):
 
         self.startServer(app, 8052)
 
-        self.wait_for_text_to_equal("#output1", "New Size: 5")
+        self.wait_for_text_to_equal("#output_mpl", "New Size: 5")
         self.percy_snapshot(name="mpl-callback-1")
 
         input_ps = self.wait_for_element_by_id("plot_size")
@@ -166,7 +166,7 @@ class Tests(IntegrationTests):
         chain.perform()
 
         input_ps.send_keys("20")
-        self.wait_for_text_to_equal("#output1", "New Size: 20")
+        self.wait_for_text_to_equal("#output_mpl", "New Size: 20")
         self.percy_snapshot(name="mpl-callback-2")
 
         assert_clean_console(self)
