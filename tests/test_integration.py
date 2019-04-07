@@ -25,12 +25,13 @@ class Tests(IntegrationTests):
 
         self.wait_for_element_by_id = wait_for_element_by_id
 
-    def test_auto_callback_default(self):
+    def test_auto_callback(self):
         app = EasyDash("auto_callback_default")
         app.layout = html.Div(
             [
                 dcc.Input(id="input", value="initial value"),
                 html.Div(html.Div([1.5, None, "string", html.Div(id="output1")])),
+                html.Div(id="output2"),
             ]
         )
 
@@ -41,10 +42,17 @@ class Tests(IntegrationTests):
             call_count.value = call_count.value + 1
             return input
 
+        @app.auto_callback()
+        def update_children_of_output2(value_of_input):
+            return value_of_input
+
         self.startServer(app, 8050)
 
         self.wait_for_text_to_equal("#output1", "initial value")
         self.percy_snapshot(name="auto-callback-1")
+
+        self.wait_for_text_to_equal("#output2", "initial value")
+        self.percy_snapshot(name="auto-callback-2")
 
         input1 = self.wait_for_element_by_id("input")
 
@@ -62,56 +70,9 @@ class Tests(IntegrationTests):
         input1.send_keys("hello world")
 
         self.wait_for_text_to_equal("#output1", "hello world")
-        self.percy_snapshot(name="auto-callback-2")
-
-        self.assertEqual(
-            call_count.value,
-            # an initial call to retrieve the first value
-            # and one for clearing the input
-            2 +
-            # one for each hello world character
-            len("hello world"),
-        )
-
-        assert_clean_console(self)
-
-    def test_auto_callback(self):
-        app = EasyDash("auto_callback")
-        app.layout = html.Div(
-            [
-                dcc.Input(id="input", value="initial value"),
-                html.Div(html.Div([1.5, None, "string", html.Div(id="output2")])),
-            ]
-        )
-
-        call_count = Value("i", 0)
-
-        @app.auto_callback()
-        def update_children_of_output2(value_of_input):
-            call_count.value = call_count.value + 1
-            return value_of_input
-
-        self.startServer(app, 8051)
-
-        self.wait_for_text_to_equal("#output2", "initial value")
         self.percy_snapshot(name="auto-callback-3")
 
-        input1 = self.wait_for_element_by_id("input")
-
-        chain = (
-            ActionChains(self.driver)
-            .click(input1)
-            .send_keys(Keys.HOME)
-            .key_down(Keys.SHIFT)
-            .send_keys(Keys.END)
-            .key_up(Keys.SHIFT)
-            .send_keys(Keys.DELETE)
-        )
-        chain.perform()
-
-        input1.send_keys("bye world")
-
-        self.wait_for_text_to_equal("#output2", "bye world")
+        self.wait_for_text_to_equal("#output2", "hello world")
         self.percy_snapshot(name="auto-callback-4")
 
         self.assertEqual(
@@ -120,7 +81,7 @@ class Tests(IntegrationTests):
             # and one for clearing the input
             2 +
             # one for each hello world character
-            len("bye world"),
+            len("hello world"),
         )
 
         assert_clean_console(self)
