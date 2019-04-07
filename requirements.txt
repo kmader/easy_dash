@@ -8,3 +8,4 @@ dash_renderer
 dash-core-components
 dash-html-components
 notebook
+pillow
