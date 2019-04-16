@@ -128,7 +128,7 @@ class EasyDash(Dash):
                 print("Inputs:", inputs)
                 print("States:", states)
 
-            return self.callback(output, inputs=inputs, states=states)(callback_func)
+            return self.callback(output, inputs=inputs, state=states)(callback_func)
 
         return wrap_callback
 
@@ -152,8 +152,8 @@ class EasyDash(Dash):
                     return html.Img(src=fig_to_uri(out_fig, dpi=dpi, **sv_args))
 
             if auto:
-                output, inputs = guess_io_args(func)
-                return self.callback(output, inputs=inputs)(add_context)
+                output, inputs, states = guess_io_args(func)
+                return self.callback(output, inputs=inputs, state=states)(add_context)
             else:
                 return add_context
 
