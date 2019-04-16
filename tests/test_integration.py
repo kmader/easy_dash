@@ -31,6 +31,7 @@ class Tests(IntegrationTests):
             [
                 dcc.Input(id="input", value="initial value"),
                 html.Div(html.Div([1.5, None, "string", html.Div(id="output1")])),
+                dcc.Input(id="fixed_message", value="junk"),
                 html.Div(id="output2"),
             ]
         )
@@ -43,15 +44,15 @@ class Tests(IntegrationTests):
             return input
 
         @app.auto_callback()
-        def update_children_of_output2(value_of_input):
-            return value_of_input
+        def update_children_of_output2(value_of_input, state_fixed_message):
+            return value_of_input + "::" + state_fixed_message
 
         self.startServer(app, 8050)
 
         self.wait_for_text_to_equal("#output1", "initial value")
         self.percy_snapshot(name="auto-callback-1")
 
-        self.wait_for_text_to_equal("#output2", "initial value")
+        self.wait_for_text_to_equal("#output2", "initial value::junk")
         self.percy_snapshot(name="auto-callback-2")
 
         input1 = self.wait_for_element_by_id("input")
@@ -72,7 +73,7 @@ class Tests(IntegrationTests):
         self.wait_for_text_to_equal("#output1", "hello world")
         self.percy_snapshot(name="auto-callback-3")
 
-        self.wait_for_text_to_equal("#output2", "hello world")
+        self.wait_for_text_to_equal("#output2", "hello world::junk")
         self.percy_snapshot(name="auto-callback-4")
 
         self.assertEqual(

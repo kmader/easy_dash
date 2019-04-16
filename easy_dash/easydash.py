@@ -9,7 +9,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 import plotly.tools as tls
 from dash.dash import Dash
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
 from .viz import fig_to_uri
 
@@ -18,10 +18,13 @@ def guess_io_args(func):
     """Guesses the callback arguments from the signature.
     >>> def update_src_of_output_5(arg_of_input): pass
     >>> guess_io_args(update_src_of_output_5)
-    (<Output `output_5.src`>, [<Input `input.arg`>])
+    (<Output `output_5.src`>, [<Input `input.arg`>], [])
     >>> def update_output_99(inp_5): pass
     >>> guess_io_args(update_output_99)
-    (<Output `output_99.children`>, [<Input `inp_5.value`>])
+    (<Output `output_99.children`>, [<Input `inp_5.value`>], [])
+    >>> def update_output_dan(state_bob_3): pass
+    >>> guess_io_args(update_output_dan)
+    (<Output `output_dan.children`>, [], [<State `bob_3.value`>])
     """
     valid_prefix_names = ["update_", "callback_"]
 
@@ -59,7 +62,12 @@ def guess_io_args(func):
 
         spec_args = spec_func(callback_func).args
         input_list = []
+        state_list = []
+        is_state = False
         for c_comp_prop_arg in spec_args:
+            if c_comp_prop_arg.startswith("state_"):
+                c_comp_prop_arg = c_comp_prop_arg[6:]
+                is_state = True
             property_start = c_comp_prop_arg.rfind("_of_")
             if property_start >= 1:
                 prop_name = c_comp_prop_arg[:property_start]
@@ -68,15 +76,19 @@ def guess_io_args(func):
                 # assume value if no underscore
                 comp_name = c_comp_prop_arg
                 prop_name = "value"
-            input_list += [Input(component_id=comp_name, component_property=prop_name)]
-        return input_list
+            obj_dict = dict(component_id=comp_name, component_property=prop_name)
+            if is_state:
+                state_list += [State(**obj_dict)]
+            else:
+                input_list += [Input(**obj_dict)]
+        return input_list, state_list
 
     # process outputs
     output = process_output(func)
 
     # process inputs
-    inputs = process_input(func)
-    return output, inputs
+    inputs, states = process_input(func)
+    return output, inputs, states
 
 
 class EasyDash(Dash):
@@ -110,12 +122,13 @@ class EasyDash(Dash):
         """
 
         def wrap_callback(callback_func):
-            output, inputs = guess_io_args(callback_func)
+            output, inputs, states = guess_io_args(callback_func)
             if debug:
                 print("Output:", output)
-            if debug:
                 print("Inputs:", inputs)
-            return self.callback(output, inputs=inputs)(callback_func)
+                print("States:", states)
+
+            return self.callback(output, inputs=inputs, state=states)(callback_func)
 
         return wrap_callback
 
@@ -139,8 +152,8 @@ class EasyDash(Dash):
                     return html.Img(src=fig_to_uri(out_fig, dpi=dpi, **sv_args))
 
             if auto:
-                output, inputs = guess_io_args(func)
-                return self.callback(output, inputs=inputs)(add_context)
+                output, inputs, states = guess_io_args(func)
+                return self.callback(output, inputs=inputs, state=states)(add_context)
             else:
                 return add_context
 
