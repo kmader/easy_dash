@@ -31,7 +31,7 @@ class Tests(IntegrationTests):
             [
                 dcc.Input(id="input", value="initial value"),
                 html.Div(html.Div([1.5, None, "string", html.Div(id="output1")])),
-                dcc.Input(id="static_message", value="junk"),
+                dcc.Input(id="fixed_message", value="junk"),
                 html.Div(id="output2"),
             ]
         )
@@ -44,8 +44,8 @@ class Tests(IntegrationTests):
             return input
 
         @app.auto_callback()
-        def update_children_of_output2(value_of_input, state_state_message):
-            return value_of_input + "::" + state_state_message
+        def update_children_of_output2(value_of_input, state_fixed_message):
+            return value_of_input + "::" + state_fixed_message
 
         self.startServer(app, 8050)
 
