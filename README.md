@@ -4,6 +4,7 @@
 [![CircleCI](https://circleci.com/gh/kmader/easy_dash.svg?style=svg)](https://circleci.com/gh/kmader/easy_dash)
 [![codecov](https://codecov.io/gh/kmader/easy_dash/branch/master/graph/badge.svg)](https://codecov.io/gh/kmader/easy_dash/branch)
 [![This project is using Percy.io for visual regression testing.](https://percy.io/static/images/percy-badge.svg)](https://percy.io)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kmader/easy_dash.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kmader/easy_dash/context:python)
 
 A simple wrapper library for making Dash apps easier to build
 ## Overview
